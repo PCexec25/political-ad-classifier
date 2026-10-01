@@ -49,7 +49,7 @@ adclass compare --preds-a runs/v2-haiku.jsonl --preds-b runs/v2-sonnet.jsonl
 
 ## The gold set
 
-`data/gold.csv` has the columns `ad_id, page_name, ad_text, source_url, gold_goal, gold_issue, notes`. Ad text comes from the public [Meta Ad Library](https://www.facebook.com/ads/library/), copied by hand and labeled according to [CODEBOOK.md](CODEBOOK.md). Rows with blank gold labels are still classified, so you can run the model on ads you haven't finished labeling.
+`data/gold.csv` has the columns `ad_id, page_name, ad_text, source_url, gold_goal, gold_issue, notes`. Ad text was copied by hand from the public [Meta Ad Library](https://www.facebook.com/ads/library/) website (no API access, scraping, or third-party tools) and labeled according to [CODEBOOK.md](CODEBOOK.md). The repo works with any source of ad text in this CSV format. Rows with blank gold labels are still classified, so you can run the model on ads you haven't finished labeling.
 
 ## Design decisions
 
@@ -79,6 +79,6 @@ adclass compare --preds-a runs/v2-haiku.jsonl --preds-b runs/v2-sonnet.jsonl
 
 ## Roadmap
 
-1. Ingest from the Meta Ad Library API (identity verification pending) instead of hand copying.
+1. Grow the gold set from additional public sources that need no account or identity verification, such as published academic ad-text datasets released for research use.
 2. Profile Google political-ad spend and targeting by advertiser from the public BigQuery dataset (`bigquery-public-data.google_political_ads`). That dataset has no ad text, so it complements this classifier rather than feeding it.
 3. Calibration analysis: does the model's self-reported confidence actually predict when it's right?
