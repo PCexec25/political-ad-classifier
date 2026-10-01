@@ -1,0 +1,5 @@
+ad_id,page_name,ad_text,source_url,gold_goal,gold_issue,notes
+syn-001,Synthetic PAC,"Prices are up and wages are flat. Candidate A has a plan to cut costs for working families.",,persuasion,economy,SYNTHETIC test row - not a real ad
+syn-002,Synthetic PAC,"Polls open 7am-7pm on Nov 3. Find your polling place at example.org.",,mobilization,other,SYNTHETIC test row - not a real ad
+syn-003,Synthetic PAC,"They want to take away your coverage. Chip in $5 to protect health care.",,fundraising,healthcare,SYNTHETIC test row - not a real ad
+syn-004,Synthetic PAC,"Unlabeled example row used to test partial labeling.",,,,SYNTHETIC test row - not a real ad

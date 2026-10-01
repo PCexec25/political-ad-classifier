@@ -1,0 +1,11 @@
+# secrets
+.env
+# local outputs
+runs/
+reports/*.md
+!reports/.gitkeep
+# python
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.venv/

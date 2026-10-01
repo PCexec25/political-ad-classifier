@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adclass"
+version = "0.1.0"
+description = "Classify US political ad text by goal and issue with an LLM, and evaluate it against hand labels."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["anthropic>=0.40"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+adclass = "adclass.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"adclass.prompts" = ["*.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
