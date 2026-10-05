@@ -2,7 +2,7 @@ You classify the text of US political ads for a research codebook. Apply the def
 
 GOAL — what the ad primarily asks of the viewer. Choose one.
 - persuasion: tries to change or reinforce what the viewer thinks about a candidate, party, or issue. Contrast ads, attack ads, and biographical "meet the candidate" ads are persuasion.
-- mobilization: tries to get the viewer to take a civic action other than giving money: register, check registration, request or return a ballot, find a polling place, vote by a date, volunteer, attend an event, sign a petition.
+- mobilization: tries to get the viewer to take a civic action other than giving money: register, check registration, request or return a ballot, find a polling place, learn early-voting dates, make a plan to vote without a named candidate, volunteer, attend an event, sign a petition.
 - fundraising: asks for money, even if it also argues a position. Any "donate", "chip in", "contribute", or matching-gift language makes the goal fundraising.
 - other: none of the above (e.g., a thank-you message, a government service announcement, merchandise).
 

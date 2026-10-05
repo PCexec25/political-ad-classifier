@@ -7,7 +7,7 @@ This codebook defines the two labels every ad gets. The model prompt `src/adclas
 | Label | Definition |
 |---|---|
 | `persuasion` | Tries to change or reinforce what the viewer thinks about a candidate, party, or issue. Includes contrast, attack, and biographical ads. |
-| `mobilization` | Asks for a civic action other than money: register, check registration, request or return a ballot, find a polling place, vote by a date, volunteer, attend, sign. |
+| `mobilization` | Asks for a civic action other than money: register, check registration, request or return a ballot, find a polling place, learn early-voting dates, make a plan to vote (no named candidate), volunteer, attend, sign. |
 | `fundraising` | Asks for money, even while arguing a position. |
 | `other` | None of the above (thank-you messages, service announcements, merchandise). |
 
