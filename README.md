@@ -25,7 +25,7 @@ git clone https://github.com/PCexec25/political-ad-classifier
 cd political-ad-classifier
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-pytest -q                                    # 43 tests, no API key needed
+pytest -q                                    # 46 tests, no API key needed
 
 export ANTHROPIC_API_KEY=...                 # see .env.example; never commit it
 adclass classify --prompt v2 --out runs/v2-haiku.jsonl --limit 5   # cheap smoke test
@@ -65,6 +65,14 @@ adclass drop-ad --id 1709809976696459 --reason "Same billboard appeal as 1285247
 ```
 
 The row moves to `data/dropped.csv` with its reason, and the importer will not re-add it.
+
+Labeling happens in `gold_labeling.xlsx`, which has codebook dropdowns, the source columns hidden so labels come from the text alone, and a progress tally. Bring the labels back with:
+
+```bash
+adclass import-labels --xlsx gold_labeling.xlsx
+```
+
+Only the label and notes columns are read from the workbook; ad text always comes from `gold.csv`. The import is all-or-nothing: an off-codebook value or a half-labeled row (goal without issue) leaves `gold.csv` untouched and names the row.
 
 Rows with blank gold labels are still classified, so you can run the model on ads you haven't finished labeling.
 

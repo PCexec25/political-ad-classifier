@@ -81,6 +81,14 @@ def _cmd_drop_ad(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_import_labels(args: argparse.Namespace) -> int:
+    from .labels_xlsx import import_labels
+
+    stats = import_labels(args.xlsx, args.gold)
+    print(f"{args.gold}: {stats['labeled']} of {stats['ads']} ads labeled; all labels valid.")
+    return 0
+
+
 def _emit(md: str, path: str | None) -> None:
     if path:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -128,6 +136,11 @@ def main(argv: list[str] | None = None) -> int:
     d.add_argument("--reason", required=True)
     d.add_argument("--gold", default="data/gold.csv")
     d.set_defaults(func=_cmd_drop_ad)
+
+    x = sub.add_parser("import-labels", help="copy labels from the labeling workbook into the gold CSV")
+    x.add_argument("--xlsx", required=True)
+    x.add_argument("--gold", default="data/gold.csv")
+    x.set_defaults(func=_cmd_import_labels)
 
     args = parser.parse_args(argv)
     return args.func(args)

@@ -40,6 +40,8 @@ def load_gold(path: str | Path) -> tuple[list[Ad], dict[str, GoldLabel]]:
             seen.add(ad_id)
             ads.append(Ad(ad_id=ad_id, text=text, page_name=row["page_name"].strip(), source_url=row["source_url"].strip()))
             goal, issue = row["gold_goal"].strip(), row["gold_issue"].strip()
+            if bool(goal) != bool(issue):
+                raise ValueError(f"{path}:{line_no}: {ad_id} has a {'goal' if goal else 'issue'} label but no {'issue' if goal else 'goal'}")
             if goal or issue:
                 try:
                     gold[ad_id] = GoldLabel(ad_id=ad_id, goal=goal, issue=issue)
