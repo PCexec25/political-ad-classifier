@@ -41,7 +41,9 @@ from pathlib import Path
 from .data_io import GOLD_COLUMNS
 
 EXTRA_COLUMNS = ("search_term", "paid_for", "started_running")
-ALL_COLUMNS = GOLD_COLUMNS + EXTRA_COLUMNS
+# Written by `adclass assist`; see assist.py.
+ASSIST_COLUMNS = ("label_mode", "suggested_goal", "suggested_issue", "suggestion_reason")
+ALL_COLUMNS = GOLD_COLUMNS + EXTRA_COLUMNS + ASSIST_COLUMNS
 
 _LIBRARY_ID = re.compile(r"^Library ID:\s*(\d+)\s*$")
 _STARTED = re.compile(r"^Started running on (.+)$")

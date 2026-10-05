@@ -38,20 +38,35 @@ def _cmd_classify(args: argparse.Namespace) -> int:
     return 0 if failures == 0 else 1
 
 
+def _subset(gold: dict, gold_path: str, mode: str) -> dict:
+    """Restrict gold labels to blind or assisted ads (see assist.py)."""
+    if mode == "all":
+        return gold
+    from .library_import import read_gold_rows
+
+    keep = {r["ad_id"] for r in read_gold_rows(Path(gold_path)) if r.get("label_mode") == mode}
+    if not keep:
+        raise ValueError(f"no ads with label_mode={mode!r} in {gold_path}; run `adclass assist` first")
+    return {k: v for k, v in gold.items() if k in keep}
+
+
 def _cmd_evaluate(args: argparse.Namespace) -> int:
     if not Path(args.preds).exists():
         print(f"No predictions file at {args.preds}. Run `adclass classify` first.", file=sys.stderr)
         return 2
     _, gold = load_gold(args.gold)
+    gold = _subset(gold, args.gold, args.subset)
     preds = load_predictions(args.preds)
     result = report.evaluate(gold, preds)
-    md = report.render_markdown(f"Evaluation: {Path(args.preds).stem}", result, report.disagreements(gold, preds))
+    title = f"Evaluation: {Path(args.preds).stem}" + ("" if args.subset == "all" else f" ({args.subset} ads only)")
+    md = report.render_markdown(title, result, report.disagreements(gold, preds))
     _emit(md, args.report)
     return 0
 
 
 def _cmd_compare(args: argparse.Namespace) -> int:
     _, gold = load_gold(args.gold)
+    gold = _subset(gold, args.gold, args.subset)
     a, b = load_predictions(args.preds_a), load_predictions(args.preds_b)
     md = report.render_comparison(Path(args.preds_a).stem, Path(args.preds_b).stem, report.compare(gold, a, b), len(gold))
     _emit(md, args.report)
@@ -84,8 +99,36 @@ def _cmd_drop_ad(args: argparse.Namespace) -> int:
 def _cmd_import_labels(args: argparse.Namespace) -> int:
     from .labels_xlsx import import_labels
 
-    stats = import_labels(args.xlsx, args.gold)
-    print(f"{args.gold}: {stats['labeled']} of {stats['ads']} ads labeled; all labels valid.")
+    s = import_labels(args.xlsx, args.gold)
+    print(f"{args.gold}: {s['labeled']} of {s['ads']} ads labeled; all labels valid.")
+    print(f"  blind ads labeled: {s['blind_labeled']}")
+    print(f"  assisted ads checked: {s['checked_assisted']}")
+    if s["checked_assisted"]:
+        n = s["checked_assisted"]
+        print(f"  you changed the suggested goal on {s['goal_overrides']}/{n} and the issue on {s['issue_overrides']}/{n}")
+    if s["unchecked_assisted"]:
+        print(f"  {s['unchecked_assisted']} assisted rows had labels but no checked=yes; imported as unlabeled")
+    return 0
+
+
+def _cmd_assist(args: argparse.Namespace) -> int:
+    from .assist import assign_assist
+
+    s = assign_assist(args.gold, n_blind=args.blind, seed=args.seed)
+    print(f"{args.gold}: {s['blind']} blind, {s['assisted']} assisted (of {s['ads']}).")
+    return 0
+
+
+def _cmd_baseline(args: argparse.Namespace) -> int:
+    from .baseline import predict
+
+    ads, _ = load_gold(args.gold)
+    out = Path(args.out)
+    if out.exists():
+        out.unlink()
+    for ad in ads:
+        write_prediction(out, predict(ad.ad_id, ad.text))
+    print(f"Wrote {len(ads)} keyword-baseline predictions to {out}")
     return 0
 
 
@@ -114,6 +157,7 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--gold", default="data/gold.csv")
     e.add_argument("--preds", required=True)
     e.add_argument("--report", help="write Markdown here instead of printing")
+    e.add_argument("--subset", choices=["all", "blind", "assisted"], default="all", help="score only blind or assisted ads")
     e.set_defaults(func=_cmd_evaluate)
 
     m = sub.add_parser("compare", help="paired comparison of two prediction files")
@@ -121,6 +165,7 @@ def main(argv: list[str] | None = None) -> int:
     m.add_argument("--preds-a", required=True)
     m.add_argument("--preds-b", required=True)
     m.add_argument("--report")
+    m.add_argument("--subset", choices=["all", "blind", "assisted"], default="all")
     m.set_defaults(func=_cmd_compare)
 
     i = sub.add_parser("import-library", help="append ads from text copied off the Meta Ad Library website")
@@ -141,6 +186,17 @@ def main(argv: list[str] | None = None) -> int:
     x.add_argument("--xlsx", required=True)
     x.add_argument("--gold", default="data/gold.csv")
     x.set_defaults(func=_cmd_import_labels)
+
+    a = sub.add_parser("assist", help="draw the blind holdout and store rule suggestions for the rest")
+    a.add_argument("--gold", default="data/gold.csv")
+    a.add_argument("--blind", type=int, default=40, help="number of blind (unassisted) ads")
+    a.add_argument("--seed", type=int, default=2026)
+    a.set_defaults(func=_cmd_assist)
+
+    b = sub.add_parser("baseline", help="run the keyword-rule baseline over the gold ads")
+    b.add_argument("--gold", default="data/gold.csv")
+    b.add_argument("--out", required=True)
+    b.set_defaults(func=_cmd_baseline)
 
     args = parser.parse_args(argv)
     return args.func(args)

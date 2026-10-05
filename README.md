@@ -25,12 +25,20 @@ git clone https://github.com/PCexec25/political-ad-classifier
 cd political-ad-classifier
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-pytest -q                                    # 46 tests, no API key needed
+pytest -q                                    # 55 tests, no API key needed
 
 export ANTHROPIC_API_KEY=...                 # see .env.example; never commit it
 adclass classify --prompt v2 --out runs/v2-haiku.jsonl --limit 5   # cheap smoke test
 adclass classify --prompt v2 --out runs/v2-haiku.jsonl             # full run (resumes if interrupted)
 adclass evaluate --preds runs/v2-haiku.jsonl --report reports/v2-haiku.md
+adclass evaluate --preds runs/v2-haiku.jsonl --subset blind   # headline number: unassisted ads only
+```
+
+Comparing against the keyword baseline:
+
+```bash
+adclass baseline --out runs/baseline.jsonl
+adclass compare --preds-a runs/baseline.jsonl --preds-b runs/v2-haiku.jsonl --subset blind
 ```
 
 Comparing the bare prompt with the codebook prompt:
@@ -66,10 +74,19 @@ adclass drop-ad --id 1709809976696459 --reason "Same billboard appeal as 1285247
 
 The row moves to `data/dropped.csv` with its reason, and the importer will not re-add it.
 
-Labeling happens in `gold_labeling.xlsx`, which has codebook dropdowns, the source columns hidden so labels come from the text alone, and a progress tally. Bring the labels back with:
+### Labeling protocol: model-assisted, with a blind holdout
+
+Labeling 143 ads from scratch is slow, so most ads are pre-labeled by the keyword-rule baseline (`src/adclass/baseline.py`) and the human checks them. Pre-labeling has a known cost: people checking a suggestion agree with it more often than they would have labeled the same way unaided (anchoring). The protocol is built to contain and measure that.
+
+- **The pre-labeler is not an LLM.** Pre-labeling with the same kind of model being evaluated would make the evaluation circular. The rule model is transparent, and every suggestion lists the keywords that produced it.
+- **A blind holdout.** `adclass assist` draws 40 ads at random (seed 2026) that get no suggestion and are labeled from scratch. The LLM's headline numbers are reported on these ads (`--subset blind`).
+- **Suggestions count only when confirmed.** In the workbook a pre-filled label becomes gold only after the row is marked `checked = yes`; unchecked rows import as unlabeled.
+- **Anchoring is measured, not assumed away.** The suggestions are stored in `gold.csv`. The import reports how often the human overrode them, and the baseline's agreement on blind vs. assisted ads estimates how much the suggestions inflated agreement.
 
 ```bash
-adclass import-labels --xlsx gold_labeling.xlsx
+adclass assist                                          # once: draw the blind set, store suggestions
+python scripts/build_labeling_xlsx.py                   # writes gold_labeling.xlsx
+adclass import-labels --xlsx gold_labeling.xlsx         # after labeling
 ```
 
 Only the label and notes columns are read from the workbook; ad text always comes from `gold.csv`. The import is all-or-nothing: an off-codebook value or a half-labeled row (goal without issue) leaves `gold.csv` untouched and names the row.
@@ -94,10 +111,11 @@ Rows with blank gold labels are still classified, so you can run the model on ad
 
 ## Results
 
-*To be filled in from `reports/` after the first full run. No numbers are reported here until they come from a real run on the real gold set.*
+*To be filled in from `reports/` after the first full run. No numbers are reported here until they come from a real run on the real gold set. Headline figures will be on the blind holdout, with full-set figures alongside.*
 
 ## Limitations
 
+- **Baseline word lists saw the data.** The keyword rules were written with the gold ads in view, so the baseline's score is optimistic; it is a floor to beat, not a fair competitor.
 - **One labeler.** Gold labels reflect one person applying the codebook. CODEBOOK.md describes a self-consistency check, but a second independent labeler would be the real test.
 - **Text only.** Most political ads are image or video. Text-only classification misses the creative itself.
 - **Small, hand-picked sample.** The gold set is not a random sample of the Ad Library, so the scores describe performance on this set, not on the population of ads.

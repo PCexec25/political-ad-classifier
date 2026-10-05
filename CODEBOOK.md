@@ -38,8 +38,9 @@ Tie-breaks:
 
 ## Labeling procedure
 
-1. **Label before you run the model.** Labels you assign after seeing the model's answer are anchored on it, and the evaluation stops measuring anything.
-2. **Use only the ad text.** That's all the model sees, so it's all the gold label may use.
-3. **Write a note on every hard call.** The `notes` column is where codebook gaps show up; recurring notes mean a definition needs tightening.
-4. **Check your own consistency.** A few days after the first pass, relabel 20 ads without looking at your earlier labels and compute agreement with `adclass.metrics.cohens_kappa`. That number is the ceiling: a model can't meaningfully beat a codebook its author applies inconsistently.
-5. **Aim for coverage, not just volume.** Around 100 ads, with at least 8–10 per goal label, and deliberately include ads that test the tie-breaks.
+1. **Label before you run the model.** Labels you assign after seeing the model's answer are anchored on it, and the evaluation stops measuring anything. The keyword-rule suggestions on assisted rows are the one sanctioned exception: they come from a different kind of model than the one being evaluated, and the blind holdout measures their influence (see README, "Labeling protocol").
+2. **Read the ad before the suggestion.** On assisted rows, form your own view from the text, then compare it with the pre-filled labels. Set `checked = yes` only after both labels match your judgment.
+3. **Use only the ad text.** That's all the model sees, so it's all the gold label may use.
+4. **Write a note on every hard call.** The `notes` column is where codebook gaps show up; recurring notes mean a definition needs tightening.
+5. **Check your own consistency.** A few days after the first pass, relabel 20 ads without looking at your earlier labels and compute agreement with `adclass.metrics.cohens_kappa`. That number is the ceiling: a model can't meaningfully beat a codebook its author applies inconsistently.
+6. **Aim for coverage, not just volume.** Around 100 ads, with at least 8–10 per goal label, and deliberately include ads that test the tie-breaks.

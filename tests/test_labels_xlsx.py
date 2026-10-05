@@ -39,7 +39,8 @@ def test_labels_flow_back_and_text_comes_from_gold(tmp_path):
         ("444", "x", None, None, None, "P"),
         ("555", "x", None, None, None, "P"),
     ])
-    assert import_labels(xlsx, gold) == {"ads": 3, "labeled": 1}
+    stats = import_labels(xlsx, gold)
+    assert (stats["ads"], stats["labeled"]) == (3, 1)
     ads, labels = load_gold(gold)
     assert labels["111"].goal == "fundraising"
     assert "EDITED" not in ads[0].text  # ad text is never taken from the workbook
@@ -63,3 +64,35 @@ def test_missing_ads_rejected(tmp_path):
     xlsx = make_xlsx(tmp_path, [("111", "t", None, None, None, "P")])
     with pytest.raises(ValueError, match="different ads"):
         import_labels(xlsx, gold)
+
+
+def test_assisted_rows_count_only_when_checked(tmp_path):
+    from adclass.assist import assign_assist
+
+    gold = make_gold(tmp_path)
+    assign_assist(gold, n_blind=1, seed=0)
+    modes = {r["ad_id"]: r for r in csv.DictReader(open(gold, encoding="utf-8"))}
+    blind = next(i for i, r in modes.items() if r["label_mode"] == "blind")
+    assisted = [i for i, r in modes.items() if r["label_mode"] == "assisted"]
+    sugg = modes[assisted[0]]
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Label"
+    ws.append(["#", "ad_id", "ad_text", "gold_goal", "gold_issue", "checked", "notes"])
+    ws.append([1, blind, "t", "other", "other", None, ""])
+    # checked, but the human changed the goal
+    changed_goal = "other" if sugg["suggested_goal"] != "other" else "persuasion"
+    ws.append([2, assisted[0], "t", changed_goal, sugg["suggested_issue"], "yes", ""])
+    # pre-filled but never checked: must not become gold
+    ws.append([3, assisted[1], "t", modes[assisted[1]]["suggested_goal"], modes[assisted[1]]["suggested_issue"], None, ""])
+    path = tmp_path / "assist.xlsx"
+    wb.save(path)
+
+    stats = import_labels(path, gold)
+    _, labels = load_gold(gold)
+    assert set(labels) == {blind, assisted[0]}
+    assert stats["blind_labeled"] == 1
+    assert stats["checked_assisted"] == 1
+    assert stats["goal_overrides"] == 1 and stats["issue_overrides"] == 0
+    assert stats["unchecked_assisted"] == 1
