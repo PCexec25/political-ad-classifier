@@ -165,8 +165,14 @@ def drop_ad(gold_path: str | Path, ad_id: str, reason: str) -> dict[str, str]:
     return entry
 
 
-def import_into_gold(raw: str, gold_path: str | Path, search_term: str, max_per_page: int = 4) -> ImportResult:
-    """Parse, clean, and append new ads to the gold CSV. Existing rows and labels are untouched."""
+def import_into_gold(
+    raw: str, gold_path: str | Path, search_term: str, max_per_page: int = 4, limit: int = 0
+) -> ImportResult:
+    """Parse, clean, and append new ads to the gold CSV. Existing rows and labels are untouched.
+
+    `limit` caps how many ads this batch adds (0 = no cap). Ad Library results
+    are sorted by reach, so a limit keeps the most-seen ads.
+    """
     gold_path = Path(gold_path)
     existing = read_gold_rows(gold_path)
     dropped_ids = {r["ad_id"] for r in read_gold_rows(dropped_path(gold_path))}
@@ -178,6 +184,9 @@ def import_into_gold(raw: str, gold_path: str | Path, search_term: str, max_per_
 
     result = ImportResult()
     for ad in parse_library_text(raw):
+        if limit and len(result.added) >= limit:
+            result.skipped.append((ad.library_id, f"batch limit of {limit} reached"))
+            continue
         if ad.library_id in seen_ids:
             result.skipped.append((ad.library_id, "already in gold file"))
             continue

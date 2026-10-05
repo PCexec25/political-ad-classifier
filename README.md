@@ -25,7 +25,7 @@ git clone https://github.com/PCexec25/political-ad-classifier
 cd political-ad-classifier
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-pytest -q                                    # 42 tests, no API key needed
+pytest -q                                    # 43 tests, no API key needed
 
 export ANTHROPIC_API_KEY=...                 # see .env.example; never commit it
 adclass classify --prompt v2 --out runs/v2-haiku.jsonl --limit 5   # cheap smoke test
@@ -53,6 +53,7 @@ adclass compare --preds-a runs/v2-haiku.jsonl --preds-b runs/v2-sonnet.jsonl
 
 ```bash
 adclass import-library --raw data/raw_chip_in.txt --search "chip in"
+adclass import-library --raw data/raw_abortion.txt --search "abortion" --limit 15   # keep the 15 highest-reach ads
 ```
 
 The importer keeps only the ad body (not the link headline or button), folds decorative Unicode such as 𝐛𝐨𝐥𝐝 letters to plain text, and skips ads with no body text, exact and near-duplicate copies (word overlap of 75% or more, which catches the same ad retargeted to another state), and anything beyond 4 ads per page. It logs every skip. Existing rows and labels are never modified. One known limitation: the body is cut off at the link domain, so when an ad has no link, its headline lines stay in the body text. Extra columns (`search_term`, `paid_for`, `started_running`) record where each ad came from. The model never sees them.

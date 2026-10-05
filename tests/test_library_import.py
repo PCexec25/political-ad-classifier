@@ -110,3 +110,12 @@ def test_drop_ad_requires_known_id_and_reason(tmp_path):
         drop_ad(gold, "999", "x")
     with pytest.raises(ValueError, match="reason"):
         drop_ad(gold, "111", "  ")
+
+
+def test_limit_keeps_first_accepted_ads_and_rerun_adds_more(tmp_path):
+    gold = tmp_path / "gold.csv"
+    result = import_into_gold(RAW, gold, search_term="x", limit=1)
+    assert [a.library_id for a in result.added] == ["111"]
+    assert "batch limit" in dict(result.skipped)["444"]
+    again = import_into_gold(RAW, gold, search_term="x", limit=1)
+    assert [a.library_id for a in again.added] == ["444"]
