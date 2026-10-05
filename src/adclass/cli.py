@@ -58,6 +58,17 @@ def _cmd_compare(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_import_library(args: argparse.Namespace) -> int:
+    from .library_import import import_into_gold
+
+    raw = Path(args.raw).read_text(encoding="utf-8")
+    result = import_into_gold(raw, args.gold, search_term=args.search, max_per_page=args.max_per_page)
+    print(f"Added {len(result.added)} ads to {args.gold}; skipped {len(result.skipped)}.")
+    for library_id, reason in result.skipped:
+        print(f"  skipped {library_id}: {reason}")
+    return 0
+
+
 def _emit(md: str, path: str | None) -> None:
     if path:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -91,6 +102,13 @@ def main(argv: list[str] | None = None) -> int:
     m.add_argument("--preds-b", required=True)
     m.add_argument("--report")
     m.set_defaults(func=_cmd_compare)
+
+    i = sub.add_parser("import-library", help="append ads from text copied off the Meta Ad Library website")
+    i.add_argument("--raw", required=True, help="text file of a pasted Ad Library results page")
+    i.add_argument("--search", required=True, help="the search term used, recorded for each row")
+    i.add_argument("--gold", default="data/gold.csv")
+    i.add_argument("--max-per-page", type=int, default=4)
+    i.set_defaults(func=_cmd_import_library)
 
     args = parser.parse_args(argv)
     return args.func(args)

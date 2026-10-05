@@ -25,7 +25,7 @@ git clone https://github.com/PCexec25/political-ad-classifier
 cd political-ad-classifier
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-pytest -q                                    # 31 tests, no API key needed
+pytest -q                                    # 38 tests, no API key needed
 
 export ANTHROPIC_API_KEY=...                 # see .env.example; never commit it
 adclass classify --prompt v2 --out runs/v2-haiku.jsonl --limit 5   # cheap smoke test
@@ -49,7 +49,15 @@ adclass compare --preds-a runs/v2-haiku.jsonl --preds-b runs/v2-sonnet.jsonl
 
 ## The gold set
 
-`data/gold.csv` has the columns `ad_id, page_name, ad_text, source_url, gold_goal, gold_issue, notes`. Ad text was copied by hand from the public [Meta Ad Library](https://www.facebook.com/ads/library/) website (no API access, scraping, or third-party tools) and labeled according to [CODEBOOK.md](CODEBOOK.md). The repo works with any source of ad text in this CSV format. Rows with blank gold labels are still classified, so you can run the model on ads you haven't finished labeling.
+`data/gold.csv` has the columns `ad_id, page_name, ad_text, source_url, gold_goal, gold_issue, notes`. Ad text was copied by hand from the public [Meta Ad Library](https://www.facebook.com/ads/library/) website (no API access, scraping, or third-party tools) and labeled according to [CODEBOOK.md](CODEBOOK.md). The repo works with any source of ad text in this CSV format. To add a batch, run a search on the Ad Library website, copy the results page into a text file, and run:
+
+```bash
+adclass import-library --raw data/raw_chip_in.txt --search "chip in"
+```
+
+The importer keeps only the ad body (not the link headline or button), folds decorative Unicode such as 𝐛𝐨𝐥𝐝 letters to plain text, and skips ads with no body text, exact and near-duplicate copies (word overlap of 90% or more), and anything beyond 4 ads per page. It logs every skip. Existing rows and labels are never modified. Extra columns (`search_term`, `paid_for`, `started_running`) record where each ad came from. The model never sees them.
+
+Rows with blank gold labels are still classified, so you can run the model on ads you haven't finished labeling.
 
 ## Design decisions
 
