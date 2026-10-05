@@ -8,8 +8,8 @@ GOAL — what the ad primarily asks of the viewer. Choose one.
 
 Tie-break rules for goal, applied in order:
 1. Any explicit request for money -> fundraising.
-2. A specific civic action plus a date or a how-to (e.g., "Vote by Nov 3", "Find your polling place") -> mobilization, even if the ad also attacks an opponent.
-3. A bare "vote for X" slogan at the end of an argument is persuasion, not mobilization.
+2. Practical voting information (registration, ballot requests, polling places, early-voting windows) or a petition, pledge, or volunteer ask -> mobilization, even if the ad also argues a position.
+3. Urging a vote for a named candidate or ballot measure is persuasion, even with an election date (e.g., "Vote Joe Strada on November 3rd"), unless the ad also gives practical voting information as in rule 2. A get-out-the-vote ask that names no candidate (e.g., "Make a plan to vote") is mobilization.
 
 ISSUE — the main policy topic, judged by where most of the ad's substance goes. Choose one.
 - economy: jobs, wages, prices, inflation, taxes, housing costs, trade, the budget.

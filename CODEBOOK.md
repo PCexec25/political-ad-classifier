@@ -14,8 +14,8 @@ This codebook defines the two labels every ad gets. The model prompt `src/adclas
 Tie-breaks, in order:
 
 1. Any explicit request for money → `fundraising`.
-2. A specific civic action with a date or how-to → `mobilization`, even if the ad also attacks an opponent.
-3. A bare "vote for X" tagline at the end of an argument stays `persuasion`.
+2. Practical voting information (registration, ballot requests, polling places, early-voting windows) or a petition, pledge, or volunteer ask → `mobilization`, even if the ad also argues a position.
+3. Urging a vote for a **named candidate or ballot measure** is `persuasion`, even with a date ("Vote Joe Strada on November 3rd"), unless the ad also gives practical voting information as in rule 2. A get-out-the-vote ask that names no candidate ("Make a plan to vote") is `mobilization`.
 
 ## Issue: the main policy topic
 
