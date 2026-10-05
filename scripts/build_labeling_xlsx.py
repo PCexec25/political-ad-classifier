@@ -94,6 +94,8 @@ def put(r, a, b="", fa=font, fb=font):
     gs.cell(r, 2, b).font = fb
     gs.cell(r, 1).alignment = wrap_top
     gs.cell(r, 2).alignment = wrap_top
+    if isinstance(b, str) and len(b) > 100:
+        gs.row_dimensions[r].height = 13 * math.ceil(len(b) / 100) + 4
 
 put(1, "Political ad labeling", "", Font(name=F, size=14, bold=True))
 put(3, "What to edit", "On the Label tab, fill in only the yellow cells: gold_goal and gold_issue (dropdowns) and notes (free text). Everything else is source data; leave it alone.", bold)
@@ -159,6 +161,13 @@ for g in GOALS:
 for s in ISSUES:
     gs.cell(r, 1, f"issue: {s}").font = font
     gs.cell(r, 2, f'=COUNTIF(Label!E2:E{last},"{s}")').font = font; gs.cell(r, 2).alignment = Alignment(horizontal="left"); r += 1
+
+for sheet in (ws, gs):
+    sheet.page_setup.orientation = "landscape"
+    sheet.page_setup.fitToWidth = 1
+    sheet.page_setup.fitToHeight = 0
+    sheet.sheet_properties.pageSetUpPr.fitToPage = True
+ws.print_title_rows = "1:1"
 
 wb.active = 1  # open on the Label tab
 out = "gold_labeling.xlsx"
