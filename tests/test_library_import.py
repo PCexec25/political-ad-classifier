@@ -4,7 +4,7 @@ import csv
 from pathlib import Path
 
 from adclass.data_io import load_gold
-from adclass.library_import import import_into_gold, normalize_text, parse_library_text
+from adclass.library_import import drop_ad, import_into_gold, normalize_text, parse_library_text
 
 RAW = (Path(__file__).parent / "fixtures" / "library_paste.txt").read_text(encoding="utf-8")
 
@@ -86,3 +86,27 @@ def test_template_variants_count_as_duplicates(tmp_path):
     result = import_into_gold(card(1, "Georgia", "October 13th") + card(2, "Arizona", "October 7th"), tmp_path / "g.csv", "x")
     assert [a.library_id for a in result.added] == ["1"]
     assert "duplicate" in dict(result.skipped)["2"]
+
+
+def test_drop_ad_logs_reason_and_blocks_reimport(tmp_path):
+    gold = tmp_path / "gold.csv"
+    import_into_gold(RAW, gold, search_term="chip in")
+    entry = drop_ad(gold, "444", "same appeal as 111 plus one paragraph")
+    assert entry["page_name"] == "Other Page"
+    ads, _ = load_gold(gold)
+    assert "444" not in [a.ad_id for a in ads]
+    with open(tmp_path / "dropped.csv", newline="", encoding="utf-8") as f:
+        assert list(csv.DictReader(f))[0]["reason"] == "same appeal as 111 plus one paragraph"
+    result = import_into_gold(RAW, gold, search_term="chip in")
+    assert "previously dropped" in dict(result.skipped)["444"]
+
+
+def test_drop_ad_requires_known_id_and_reason(tmp_path):
+    import pytest
+
+    gold = tmp_path / "gold.csv"
+    import_into_gold(RAW, gold, search_term="chip in")
+    with pytest.raises(ValueError, match="not in"):
+        drop_ad(gold, "999", "x")
+    with pytest.raises(ValueError, match="reason"):
+        drop_ad(gold, "111", "  ")

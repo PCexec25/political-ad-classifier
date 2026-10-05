@@ -127,10 +127,49 @@ def read_gold_rows(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(f))
 
 
+DROPPED_COLUMNS = ("ad_id", "page_name", "reason", "ad_text")
+
+
+def dropped_path(gold_path: Path) -> Path:
+    return gold_path.with_name("dropped.csv")
+
+
+def drop_ad(gold_path: str | Path, ad_id: str, reason: str) -> dict[str, str]:
+    """Remove one row from the gold file and log it with a reason in dropped.csv.
+
+    For judgment calls the automatic rules can't make (e.g. the same appeal
+    with an extra paragraph). The log keeps the decision auditable, and the
+    importer reads it so a dropped ad is never re-added.
+    """
+    gold_path = Path(gold_path)
+    if not reason.strip():
+        raise ValueError("a reason is required")
+    rows = read_gold_rows(gold_path)
+    match = [r for r in rows if r["ad_id"] == ad_id]
+    if not match:
+        raise ValueError(f"ad_id {ad_id!r} is not in {gold_path}")
+    with open(gold_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=list(ALL_COLUMNS), extrasaction="ignore")
+        writer.writeheader()
+        for row in rows:
+            if row["ad_id"] != ad_id:
+                writer.writerow({col: row.get(col, "") for col in ALL_COLUMNS})
+    log = dropped_path(gold_path)
+    new_log = not log.exists()
+    with open(log, "a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=list(DROPPED_COLUMNS))
+        if new_log:
+            writer.writeheader()
+        entry = {"ad_id": ad_id, "page_name": match[0]["page_name"], "reason": reason.strip(), "ad_text": match[0]["ad_text"]}
+        writer.writerow(entry)
+    return entry
+
+
 def import_into_gold(raw: str, gold_path: str | Path, search_term: str, max_per_page: int = 4) -> ImportResult:
     """Parse, clean, and append new ads to the gold CSV. Existing rows and labels are untouched."""
     gold_path = Path(gold_path)
     existing = read_gold_rows(gold_path)
+    dropped_ids = {r["ad_id"] for r in read_gold_rows(dropped_path(gold_path))}
     seen_ids = {r["ad_id"] for r in existing}
     seen_texts = [_word_set(r["ad_text"]) for r in existing]
     page_counts: dict[str, int] = {}
@@ -141,6 +180,9 @@ def import_into_gold(raw: str, gold_path: str | Path, search_term: str, max_per_
     for ad in parse_library_text(raw):
         if ad.library_id in seen_ids:
             result.skipped.append((ad.library_id, "already in gold file"))
+            continue
+        if ad.library_id in dropped_ids:
+            result.skipped.append((ad.library_id, "previously dropped (see dropped.csv)"))
             continue
         if not ad.text:
             result.skipped.append((ad.library_id, f"no body text ({ad.page_name or 'unknown page'})"))

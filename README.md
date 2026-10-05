@@ -25,7 +25,7 @@ git clone https://github.com/PCexec25/political-ad-classifier
 cd political-ad-classifier
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
-pytest -q                                    # 38 tests, no API key needed
+pytest -q                                    # 42 tests, no API key needed
 
 export ANTHROPIC_API_KEY=...                 # see .env.example; never commit it
 adclass classify --prompt v2 --out runs/v2-haiku.jsonl --limit 5   # cheap smoke test
@@ -56,6 +56,14 @@ adclass import-library --raw data/raw_chip_in.txt --search "chip in"
 ```
 
 The importer keeps only the ad body (not the link headline or button), folds decorative Unicode such as 𝐛𝐨𝐥𝐝 letters to plain text, and skips ads with no body text, exact and near-duplicate copies (word overlap of 75% or more, which catches the same ad retargeted to another state), and anything beyond 4 ads per page. It logs every skip. Existing rows and labels are never modified. One known limitation: the body is cut off at the link domain, so when an ad has no link, its headline lines stay in the body text. Extra columns (`search_term`, `paid_for`, `started_running`) record where each ad came from. The model never sees them.
+
+Near-duplicates that the automatic rule misses, such as the same appeal with one extra paragraph, are removed by hand with a logged reason:
+
+```bash
+adclass drop-ad --id 1709809976696459 --reason "Same billboard appeal as 1285247517012202 plus one paragraph"
+```
+
+The row moves to `data/dropped.csv` with its reason, and the importer will not re-add it.
 
 Rows with blank gold labels are still classified, so you can run the model on ads you haven't finished labeling.
 

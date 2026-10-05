@@ -69,6 +69,14 @@ def _cmd_import_library(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_drop_ad(args: argparse.Namespace) -> int:
+    from .library_import import drop_ad
+
+    entry = drop_ad(args.gold, args.id, args.reason)
+    print(f"Dropped {entry['ad_id']} ({entry['page_name']}): {entry['reason']}")
+    return 0
+
+
 def _emit(md: str, path: str | None) -> None:
     if path:
         Path(path).parent.mkdir(parents=True, exist_ok=True)
@@ -109,6 +117,12 @@ def main(argv: list[str] | None = None) -> int:
     i.add_argument("--gold", default="data/gold.csv")
     i.add_argument("--max-per-page", type=int, default=4)
     i.set_defaults(func=_cmd_import_library)
+
+    d = sub.add_parser("drop-ad", help="remove an ad from the gold file, logging the reason in dropped.csv")
+    d.add_argument("--id", required=True)
+    d.add_argument("--reason", required=True)
+    d.add_argument("--gold", default="data/gold.csv")
+    d.set_defaults(func=_cmd_drop_ad)
 
     args = parser.parse_args(argv)
     return args.func(args)
