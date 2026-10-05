@@ -82,6 +82,9 @@ def _is_terminator(line: str) -> bool:
         or bool(_DOMAIN.match(s))
         or s == "NOT AFFILIATED WITH META"
         or s.startswith("Impressions:")
+        # "Active" opens the next card. Pasting through some apps strips the
+        # zero-width separator, so this is the fallback end-of-body marker.
+        or s == "Active"
     )
 
 

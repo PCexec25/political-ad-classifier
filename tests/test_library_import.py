@@ -61,3 +61,14 @@ def test_reimport_preserves_labels_and_skips_known_ids(tmp_path):
     assert result.added == []
     _, labels = load_gold(gold)
     assert labels["111"].goal == "fundraising"
+
+
+def test_body_ends_at_next_card_when_separators_are_stripped():
+    # Chat apps can drop the zero-width separator and leave blank lines instead.
+    raw = (
+        "Library ID: 1\nPage\nPage\nSponsored • Paid for by C\nBody line.\n\n\n"
+        "Active\nLibrary ID: 2\nPage2\nPage2\nSponsored • Paid for by D\nOther body.\n"
+    )
+    first, second = parse_library_text(raw)
+    assert first.text == "Body line."
+    assert second.text == "Other body."
