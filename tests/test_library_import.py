@@ -72,3 +72,17 @@ def test_body_ends_at_next_card_when_separators_are_stripped():
     first, second = parse_library_text(raw)
     assert first.text == "Body line."
     assert second.text == "Other body."
+
+
+def test_template_variants_count_as_duplicates(tmp_path):
+    # Same ad re-targeted to another state: a few words differ (~80% overlap).
+    def card(lid, state, date):
+        return (
+            f"Active\nLibrary ID: {lid}\nP\nP\nSponsored • Paid for by C\n"
+            "Are you concerned about the rise of socialism? Millions of Americans are concerned "
+            f"that it is destroying the American Dream. Early voting begins on {date}. "
+            f"Make a plan to vote to stop it in {state}.\n0:00 / 0:31\n"
+        )
+    result = import_into_gold(card(1, "Georgia", "October 13th") + card(2, "Arizona", "October 7th"), tmp_path / "g.csv", "x")
+    assert [a.library_id for a in result.added] == ["1"]
+    assert "duplicate" in dict(result.skipped)["2"]

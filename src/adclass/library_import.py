@@ -25,7 +25,7 @@ deliberately excluded: the codebook labels the body copy only.
 
 Cleaning rules, all logged so nothing disappears silently:
 - ads with no body text (video- or image-only) are skipped;
-- exact and near-duplicate bodies (word-set Jaccard >= 0.9) are skipped,
+- exact and near-duplicate bodies (word-set Jaccard >= 0.75) are skipped,
   across this batch and the existing gold file;
 - at most `max_per_page` ads per page across the whole gold file.
 """
@@ -49,7 +49,7 @@ _SPONSORED = re.compile(r"^Sponsored\s*•\s*Paid for by\s+(.+)$")
 _VIDEO_TIMER = re.compile(r"^\d{1,2}:\d{2}\s*/\s*\d{1,2}:\d{2}$")
 _DOMAIN = re.compile(r"^[A-Z0-9-]+(\.[A-Z0-9-]+)+$")
 _ZERO_WIDTH = "​"
-NEAR_DUP_THRESHOLD = 0.9
+NEAR_DUP_THRESHOLD = 0.75
 
 
 @dataclass

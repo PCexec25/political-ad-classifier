@@ -55,7 +55,7 @@ adclass compare --preds-a runs/v2-haiku.jsonl --preds-b runs/v2-sonnet.jsonl
 adclass import-library --raw data/raw_chip_in.txt --search "chip in"
 ```
 
-The importer keeps only the ad body (not the link headline or button), folds decorative Unicode such as 𝐛𝐨𝐥𝐝 letters to plain text, and skips ads with no body text, exact and near-duplicate copies (word overlap of 90% or more), and anything beyond 4 ads per page. It logs every skip. Existing rows and labels are never modified. Extra columns (`search_term`, `paid_for`, `started_running`) record where each ad came from. The model never sees them.
+The importer keeps only the ad body (not the link headline or button), folds decorative Unicode such as 𝐛𝐨𝐥𝐝 letters to plain text, and skips ads with no body text, exact and near-duplicate copies (word overlap of 75% or more, which catches the same ad retargeted to another state), and anything beyond 4 ads per page. It logs every skip. Existing rows and labels are never modified. One known limitation: the body is cut off at the link domain, so when an ad has no link, its headline lines stay in the body text. Extra columns (`search_term`, `paid_for`, `started_running`) record where each ad came from. The model never sees them.
 
 Rows with blank gold labels are still classified, so you can run the model on ads you haven't finished labeling.
 
