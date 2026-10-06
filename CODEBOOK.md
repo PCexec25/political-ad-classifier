@@ -7,16 +7,16 @@ This codebook defines the two labels every ad gets. The model prompt `src/adclas
 | Label | Definition |
 |---|---|
 | `persuasion` | Tries to change or reinforce what the viewer thinks about a candidate, party, or issue. Includes contrast, attack, and biographical ads. |
-| `mobilization` | Asks for a civic action other than money: register, check registration, request or return a ballot, find a polling place, learn early-voting dates, make a plan to vote (no named candidate), volunteer, attend, sign. |
+| `mobilization` | Asks for a civic action other than money, **when that action is the ad's main purpose**: register, check registration, request or return a ballot, find a polling place, learn early-voting dates, make a plan to vote (no named candidate), volunteer, attend an event. Petitions and sign-ups are not mobilization (rule 4). |
 | `fundraising` | Asks for money, even while arguing a position. The ask may be implied: a campaign or organization asking for the viewer's "help" or "support" to keep fighting, with no other concrete action named. |
 | `other` | None of the above (thank-you messages, service announcements, merchandise). |
 
 Tie-breaks, in order:
 
 1. Any explicit request for money → `fundraising`.
-2. Practical voting information (registration, ballot requests, polling places, early-voting windows) or a petition, pledge, or volunteer ask → `mobilization`, even if the ad also argues a position.
-3. Urging a vote for a **named candidate or ballot measure** is `persuasion`, even with a date ("Vote Joe Strada on November 3rd"), unless the ad also gives practical voting information as in rule 2. A get-out-the-vote ask that names no candidate ("Make a plan to vote") is `mobilization`.
-4. An **implied** money ask (a campaign or organization asking for "help" or "support" to keep fighting, with no other concrete action named) → `fundraising`. An explicit civic action under rule 2 beats an implied ask: "add your name" is a petition, so `mobilization`.
+2. Practical voting information (registration, ballot requests, polling places, early-voting windows) or a volunteer or event ask → `mobilization` **when it is the ad's main purpose**. An ad that mainly argues for a candidate or position and also lists voting dates stays `persuasion`.
+3. Urging a vote for a **named candidate or ballot measure** is `persuasion`, even with a date or early-voting window ("Vote Joe Strada on November 3rd"). A get-out-the-vote ask that names no candidate ("Make a plan to vote") is `mobilization`.
+4. **Implied asks, petitions, and sign-ups.** A campaign or organization asking for "help" or "support" to keep fighting, with no other concrete action named, is an implied money ask → `fundraising`. Petitions and sign-ups ("sign the petition", "add your name", "join us") are not `mobilization`; label them by the rest of the ad. If the ad argues an issue or position ("A nation without borders is not a nation… sign the petition"), it is `persuasion`. If it is an organization's appeal for support with no argument beyond its mission ("We'll never back down… if you're with us, add your name"), it is `fundraising`.
 5. **Too little text to judge.** If the ad promotes a named candidate, it is `persuasion` even when vague ("I'm ready to bring a winning game plan to Washington"). If you can't tell what it asks at all ("Clock it ⏰"), it is `other`. Either way, the issue is `other` unless a topic is named.
 
 ## Issue: the main policy topic

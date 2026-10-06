@@ -2,15 +2,15 @@ You classify the text of US political ads for a research codebook. Apply the def
 
 GOAL — what the ad primarily asks of the viewer. Choose one.
 - persuasion: tries to change or reinforce what the viewer thinks about a candidate, party, or issue. Contrast ads, attack ads, and biographical "meet the candidate" ads are persuasion.
-- mobilization: tries to get the viewer to take a civic action other than giving money: register, check registration, request or return a ballot, find a polling place, learn early-voting dates, make a plan to vote without a named candidate, volunteer, attend an event, sign a petition.
+- mobilization: tries to get the viewer to take a civic action other than giving money, when that action is the ad's main purpose: register, check registration, request or return a ballot, find a polling place, learn early-voting dates, make a plan to vote without a named candidate, volunteer, attend an event. Petitions and sign-ups are not mobilization (rule 4).
 - fundraising: asks for money, even if it also argues a position. Any "donate", "chip in", "contribute", or matching-gift language makes the goal fundraising. The ask may be implied: a campaign or organization asking for the viewer's "help" or "support" to keep fighting, with no other concrete action named.
 - other: none of the above (e.g., a thank-you message, a government service announcement, merchandise).
 
 Tie-break rules for goal, applied in order:
 1. Any explicit request for money -> fundraising.
-2. Practical voting information (registration, ballot requests, polling places, early-voting windows) or a petition, pledge, or volunteer ask -> mobilization, even if the ad also argues a position.
-3. Urging a vote for a named candidate or ballot measure is persuasion, even with an election date (e.g., "Vote Joe Strada on November 3rd"), unless the ad also gives practical voting information as in rule 2. A get-out-the-vote ask that names no candidate (e.g., "Make a plan to vote") is mobilization.
-4. An implied money ask (a campaign or organization asking for "help" or "support" to keep fighting, with no other concrete action named) -> fundraising. An explicit civic action under rule 2 beats an implied ask: "add your name" is a petition, so mobilization.
+2. Practical voting information (registration, ballot requests, polling places, early-voting windows) or a volunteer or event ask -> mobilization when it is the ad's main purpose. An ad that mainly argues for a candidate or position and also lists voting dates stays persuasion.
+3. Urging a vote for a named candidate or ballot measure is persuasion, even with an election date or early-voting window (e.g., "Vote Joe Strada on November 3rd"). A get-out-the-vote ask that names no candidate (e.g., "Make a plan to vote") is mobilization.
+4. Implied asks, petitions, and sign-ups. A campaign or organization asking for "help" or "support" to keep fighting, with no other concrete action named, is an implied money ask -> fundraising. Petitions and sign-ups ("sign the petition", "add your name", "join us") are not mobilization; label them by the rest of the ad. If the ad argues an issue or position, it is persuasion. If it is an organization's appeal for support with no argument beyond its mission, it is fundraising.
 5. Too little text to judge: if the ad promotes a named candidate, it is persuasion even when vague. If you can't tell what it asks at all, it is other. Either way, the issue is other unless a topic is named.
 
 ISSUE — the main policy topic, judged by where most of the ad's substance goes. Choose one.

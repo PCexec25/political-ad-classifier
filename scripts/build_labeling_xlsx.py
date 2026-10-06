@@ -164,13 +164,13 @@ put(r, "checked", "yes", fill=white); r += 2
 put(r, "GOAL", "What the ad primarily asks of the viewer", bold, bold); r += 1
 for a, b in [
     ("persuasion", "Change or reinforce what the viewer thinks about a candidate, party, or issue (contrast, attack, biography)."),
-    ("mobilization", "A civic action other than money: register, request/return a ballot, find a polling place, learn early-voting dates, make a plan to vote (no named candidate), volunteer, attend, sign a petition or pledge."),
+    ("mobilization", "A civic action other than money, when it is the ad's main purpose: register, request/return a ballot, find a polling place, learn early-voting dates, make a plan to vote (no named candidate), volunteer, attend. Petitions are not mobilization (tie-break 4)."),
     ("fundraising", "Asks for money, even while arguing a position. The ask may be implied: a campaign or organization asking for 'help' or 'support' to keep fighting, with no other concrete action named."),
     ("other", "None of the above (lead generation, merchandise, streaming, service announcements, thank-yous)."),
     ("Tie-break 1", "Any explicit request for money -> fundraising."),
-    ("Tie-break 2", "Practical voting info, or a petition / pledge / volunteer ask -> mobilization, even if the ad also argues a position."),
-    ("Tie-break 3", "Urging a vote for a named candidate or ballot measure is persuasion, even with a date, unless the ad also gives practical voting info. A get-out-the-vote ask naming no candidate is mobilization."),
-    ("Tie-break 4", "Implied money ask (asks for 'help'/'support', no other concrete action) -> fundraising. An explicit civic action under rule 2 beats it: 'add your name' is a petition -> mobilization."),
+    ("Tie-break 2", "Practical voting info or a volunteer/event ask -> mobilization when it is the ad's main purpose. A candidate or issue argument that also lists voting dates stays persuasion."),
+    ("Tie-break 3", "Urging a vote for a named candidate or ballot measure is persuasion, even with a date or early-voting window. A get-out-the-vote ask naming no candidate is mobilization."),
+    ("Tie-break 4", "Implied money ask ('help'/'support', no other concrete action) -> fundraising. Petitions and sign-ups are labeled by the rest of the ad: argues a position -> persuasion; an organization's support appeal with no argument -> fundraising."),
     ("Tie-break 5", "Too little text: promotes a named candidate -> persuasion, even if vague. Can't tell what it asks at all -> other. Issue is other unless a topic is named."),
 ]:
     put(r, a, b, bold if a.startswith("Tie") else font); r += 1

@@ -93,6 +93,12 @@ Only the label and notes columns are read from the workbook; ad text always come
 
 Rows with blank gold labels are still classified, so you can run the model on ads you haven't finished labeling.
 
+### What happened when the protocol ran
+
+- **Blind ads (40)** were labeled from scratch. Error analysis on them surfaced codebook gaps that were resolved by amending the codebook, not by quietly relabeling. Four rules were added or rewritten: implied money asks; a broader `candidate_character`; vague ads; and petitions, which are labeled by the rest of the ad rather than counted as mobilization.
+- **Assisted ads (103)** were all confirmed, with 1 issue label changed and no goal labels changed. On them, the keyword baseline scores 100% on goal and 99% on issue, against 72.5% and 80% on the blind ads. That gap is the anchoring effect the protocol was designed to measure: the assisted labels are effectively the baseline's own output.
+- **Consequence:** model evaluation uses the 40 blind ads. The assisted labels are kept and disclosed, but they are not used to score any model, because scoring a model against them would mostly measure agreement with keyword rules. The keyword baseline was frozen as `rules-v1` before the codebook amendments, so it predates rules 4 and 5.
+
 ## Design decisions
 
 - **Structured output by forced tool call.** The model must answer through a JSON schema whose enums are generated from `schema.py`. Nothing is parsed out of free text.
@@ -111,7 +117,15 @@ Rows with blank gold labels are still classified, so you can run the model on ad
 
 ## Results
 
-*To be filled in from `reports/` after the first full run. No numbers are reported here until they come from a real run on the real gold set. Headline figures will be on the blind holdout, with full-set figures alongside.*
+All figures are on the 40 blind ads; 95% bootstrap intervals are in parentheses.
+
+| System | Goal accuracy | Goal macro-F1 | Issue accuracy | Issue macro-F1 |
+|---|---|---|---|---|
+| Keyword baseline (`rules-v1`) | 72.5% (57.5–85.0) | 0.56 | 80.0% (67.5–92.5) | 0.78 |
+| Claude, prompt v1 | *pending* | | | |
+| Claude, prompt v2 (codebook) | *pending* | | | |
+
+With n = 40, intervals span roughly ±15 points. Differences between systems are tested with McNemar's exact test (`adclass compare --subset blind`), not by comparing point estimates.
 
 ## Limitations
 
