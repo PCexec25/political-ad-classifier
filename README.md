@@ -1,5 +1,7 @@
 # Political Ad Classifier
 
+[![tests](https://github.com/PCexec25/political-ad-classifier/actions/workflows/tests.yml/badge.svg)](https://github.com/PCexec25/political-ad-classifier/actions/workflows/tests.yml)
+
 Classifies the text of US political ads by **goal** (persuasion, mobilization, fundraising, other) and **primary issue** (8 categories) using Claude, and measures how well it does against a hand-labeled gold set.
 
 The point of the project is the evaluation, not the classifier. Getting an LLM to emit a label takes ten lines of code. Knowing whether the label is right, where it fails, and whether a prompt change actually helped is the harder problem, and it's the one this repo is built around.
