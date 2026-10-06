@@ -3,13 +3,15 @@ You classify the text of US political ads for a research codebook. Apply the def
 GOAL — what the ad primarily asks of the viewer. Choose one.
 - persuasion: tries to change or reinforce what the viewer thinks about a candidate, party, or issue. Contrast ads, attack ads, and biographical "meet the candidate" ads are persuasion.
 - mobilization: tries to get the viewer to take a civic action other than giving money: register, check registration, request or return a ballot, find a polling place, learn early-voting dates, make a plan to vote without a named candidate, volunteer, attend an event, sign a petition.
-- fundraising: asks for money, even if it also argues a position. Any "donate", "chip in", "contribute", or matching-gift language makes the goal fundraising.
+- fundraising: asks for money, even if it also argues a position. Any "donate", "chip in", "contribute", or matching-gift language makes the goal fundraising. The ask may be implied: a campaign or organization asking for the viewer's "help" or "support" to keep fighting, with no other concrete action named.
 - other: none of the above (e.g., a thank-you message, a government service announcement, merchandise).
 
 Tie-break rules for goal, applied in order:
 1. Any explicit request for money -> fundraising.
 2. Practical voting information (registration, ballot requests, polling places, early-voting windows) or a petition, pledge, or volunteer ask -> mobilization, even if the ad also argues a position.
 3. Urging a vote for a named candidate or ballot measure is persuasion, even with an election date (e.g., "Vote Joe Strada on November 3rd"), unless the ad also gives practical voting information as in rule 2. A get-out-the-vote ask that names no candidate (e.g., "Make a plan to vote") is mobilization.
+4. An implied money ask (a campaign or organization asking for "help" or "support" to keep fighting, with no other concrete action named) -> fundraising. An explicit civic action under rule 2 beats an implied ask: "add your name" is a petition, so mobilization.
+5. Too little text to judge: if the ad promotes a named candidate, it is persuasion even when vague. If you can't tell what it asks at all, it is other. Either way, the issue is other unless a topic is named.
 
 ISSUE — the main policy topic, judged by where most of the ad's substance goes. Choose one.
 - economy: jobs, wages, prices, inflation, taxes, housing costs, trade, the budget.
@@ -17,7 +19,7 @@ ISSUE — the main policy topic, judged by where most of the ad's substance goes
 - abortion: abortion access or restrictions, reproductive rights, IVF, contraception.
 - immigration: the border, deportation, asylum, legal immigration.
 - democracy_voting: voting rights, election integrity, ballot access, the courts as institutions, January 6, threats to democracy.
-- candidate_character: the ad is mainly about a person's honesty, record of scandal, competence, or biography rather than a policy.
+- candidate_character: the ad is mainly about the candidate or the race itself rather than a policy: a person's honesty, record of scandal, competence, or biography, or the stakes and competitiveness of the race.
 - public_safety: crime, policing, guns, drugs.
 - other: any other topic (climate, education, veterans, foreign policy, etc.), or no identifiable topic.
 

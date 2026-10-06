@@ -25,6 +25,9 @@ rows = list(csv.DictReader(open(ROOT / "data" / "gold.csv", encoding="utf-8")))
 if not all(r.get("label_mode") for r in rows):
     sys.exit("Run `adclass assist` first so every ad is marked blind or assisted.")
 N = len(rows)
+# Blind ads whose labels conflict with a codebook rule added after labeling.
+recheck_path = ROOT / "data" / "recheck.csv"
+RECHECK = {r["ad_id"]: r["reason"] for r in csv.DictReader(open(recheck_path, encoding="utf-8"))} if recheck_path.exists() else {}
 N_BLIND = sum(r["label_mode"] == "blind" for r in rows)
 N_ASSIST = N - N_BLIND
 
@@ -67,7 +70,8 @@ for n, r in enumerate(rows, start=1):
         "gold_issue": r["gold_issue"] or ("" if blind else r["suggested_issue"]),
         "checked": "blind" if blind else "",
         "notes": r["notes"],
-        "why_suggested": "BLIND: label from scratch" if blind else r["suggestion_reason"],
+        "why_suggested": (f"BLIND. RECHECK: codebook updated ({RECHECK[r['ad_id']]})" if r["ad_id"] in RECHECK
+                          else "BLIND: label from scratch") if blind else r["suggestion_reason"],
     }
     ws.append([values.get(c, r.get(c, "")) for c in cols])
     row = n + 1
@@ -76,7 +80,7 @@ for n, r in enumerate(rows, start=1):
     ws.cell(row, col["#"]).font = grey
     ws.cell(row, col["ad_id"]).font = grey
     ws.cell(row, col["ad_id"]).number_format = "@"
-    ws.cell(row, col["why_suggested"]).font = Font(name=F, size=9, color="595959", bold=blind)
+    ws.cell(row, col["why_suggested"]).font = Font(name=F, size=9, color="C00000" if r["ad_id"] in RECHECK else "595959", bold=blind)
     for name in ("gold_goal", "gold_issue"):
         ws.cell(row, col[name]).fill = todo_fill if blind else suggest_fill
     ws.cell(row, col["checked"]).fill = na_fill if blind else todo_fill
@@ -148,6 +152,7 @@ put(r, f"Blind ({N_BLIND})", "No suggestion (checked shows 'blind'). Label from 
 put(r, "Done looks like", "A row turns white when it's final. Notes are optional: one line on any close call.", bold); r += 1
 put(r, "Don't rubber-stamp", "If you find you're accepting nearly every suggestion without reading the ad, slow down. The import reports how often you changed the suggested labels.", bold); r += 1
 put(r, "Hidden columns", "page_name, source_url, search_term, paid_for, and started_running are hidden on purpose; label from the words only. Leave them in the file.", bold); r += 1
+put(r, "Red RECHECK rows", "Blind ads whose labels may conflict with codebook rules added after your first pass. Reread the ad and the named rule; keep or change your label.", bold); r += 1
 put(r, "When done", "Save as .xlsx and run: adclass import-labels --xlsx gold_labeling.xlsx (or send the file back).", bold); r += 2
 
 put(r, "Example (not a real ad)", "", bold); r += 1
@@ -160,11 +165,13 @@ put(r, "GOAL", "What the ad primarily asks of the viewer", bold, bold); r += 1
 for a, b in [
     ("persuasion", "Change or reinforce what the viewer thinks about a candidate, party, or issue (contrast, attack, biography)."),
     ("mobilization", "A civic action other than money: register, request/return a ballot, find a polling place, learn early-voting dates, make a plan to vote (no named candidate), volunteer, attend, sign a petition or pledge."),
-    ("fundraising", "Asks for money, even while arguing a position."),
+    ("fundraising", "Asks for money, even while arguing a position. The ask may be implied: a campaign or organization asking for 'help' or 'support' to keep fighting, with no other concrete action named."),
     ("other", "None of the above (lead generation, merchandise, streaming, service announcements, thank-yous)."),
     ("Tie-break 1", "Any explicit request for money -> fundraising."),
     ("Tie-break 2", "Practical voting info, or a petition / pledge / volunteer ask -> mobilization, even if the ad also argues a position."),
     ("Tie-break 3", "Urging a vote for a named candidate or ballot measure is persuasion, even with a date, unless the ad also gives practical voting info. A get-out-the-vote ask naming no candidate is mobilization."),
+    ("Tie-break 4", "Implied money ask (asks for 'help'/'support', no other concrete action) -> fundraising. An explicit civic action under rule 2 beats it: 'add your name' is a petition -> mobilization."),
+    ("Tie-break 5", "Too little text: promotes a named candidate -> persuasion, even if vague. Can't tell what it asks at all -> other. Issue is other unless a topic is named."),
 ]:
     put(r, a, b, bold if a.startswith("Tie") else font); r += 1
 r += 1
@@ -175,7 +182,7 @@ for a, b in [
     ("abortion", "Abortion access or restrictions, reproductive rights, IVF, contraception"),
     ("immigration", "Border, deportation, asylum, legal immigration"),
     ("democracy_voting", "Voting rights, election integrity, ballot access, courts as institutions, threats to democracy"),
-    ("candidate_character", "Mainly about a person's honesty, scandal, competence, or biography rather than a policy"),
+    ("candidate_character", "Mainly about the candidate or the race itself: honesty, scandal, competence, biography, or the stakes and competitiveness of the race"),
     ("public_safety", "Crime, policing, guns, drugs"),
     ("other", "Anything else (climate, education, veterans, foreign policy), or no identifiable topic"),
     ("Tie-break 1", "Two issues present -> the one with more of the ad's words."),
