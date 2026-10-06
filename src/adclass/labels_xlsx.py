@@ -22,10 +22,15 @@ LABEL_COLUMNS = ("gold_goal", "gold_issue", "notes")
 
 
 def import_labels(xlsx_path: str | Path, gold_path: str | Path) -> dict[str, int]:
-    from openpyxl import load_workbook
+    """Accepts the .xlsx workbook or a .csv export of its Label sheet."""
+    if str(xlsx_path).lower().endswith(".csv"):
+        # A CSV export of the Label sheet (e.g. File > Download > CSV in Google Sheets).
+        f = open(xlsx_path, newline="", encoding="utf-8-sig")
+        rows = iter([[v if v != "" else None for v in rec] for rec in csv.reader(f)])
+    else:
+        from openpyxl import load_workbook
 
-    ws = load_workbook(xlsx_path, read_only=True, data_only=True)["Label"]
-    rows = ws.iter_rows(values_only=True)
+        rows = load_workbook(xlsx_path, read_only=True, data_only=True)["Label"].iter_rows(values_only=True)
     header = [str(h) if h is not None else "" for h in next(rows)]
     missing = {"ad_id", *LABEL_COLUMNS} - set(header)
     if missing:

@@ -96,3 +96,15 @@ def test_assisted_rows_count_only_when_checked(tmp_path):
     assert stats["checked_assisted"] == 1
     assert stats["goal_overrides"] == 1 and stats["issue_overrides"] == 0
     assert stats["unchecked_assisted"] == 1
+
+
+def test_csv_export_of_label_sheet_is_accepted(tmp_path):
+    gold = make_gold(tmp_path)
+    path = tmp_path / "Label.csv"
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["#", "ad_id", "ad_text", "gold_goal", "gold_issue", "notes"])
+        w.writerow([1, "111", "t", "fundraising", "other", ""])
+        w.writerow([2, "444", "t", "", "", ""])
+        w.writerow([3, "555", "t", "", "", ""])
+    assert import_labels(path, gold)["labeled"] == 1

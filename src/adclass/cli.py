@@ -183,7 +183,7 @@ def main(argv: list[str] | None = None) -> int:
     d.set_defaults(func=_cmd_drop_ad)
 
     x = sub.add_parser("import-labels", help="copy labels from the labeling workbook into the gold CSV")
-    x.add_argument("--xlsx", required=True)
+    x.add_argument("--xlsx", required=True, help="the labeling workbook, or a CSV export of its Label sheet")
     x.add_argument("--gold", default="data/gold.csv")
     x.set_defaults(func=_cmd_import_labels)
 
